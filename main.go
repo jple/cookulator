@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Unit int
 
 const (
@@ -23,16 +21,17 @@ var UnitDict = map[Unit]string{
 }
 
 func main() {
-	v1 := Ingredients{
-		CreateIngredient("farine", 1000, G),
-		CreateIngredient("eau", 500, G),
-	}
-	v2 := Ingredients{
-		CreateIngredient("farine", 850, G),
-		CreateIngredient("eau", 400, G),
-	}
-	fmt.Printf("%+v\n", v1)
-	v1.SetSameQuantity(v2, "farine")
-	fmt.Printf("%+v\n", v1)
+	// f()
+	// v1 := Ingredients{
+	// 	CreateIngredient("farine", 1000, G),
+	// 	CreateIngredient("eau", 500, G),
+	// }
+	// v2 := Ingredients{
+	// 	CreateIngredient("farine", 850, G),
+	// 	CreateIngredient("eau", 400, G),
+	// }
+	// fmt.Printf("%+v\n", v1)
+	// v1.SetSameQuantity(v2, "farine")
+	// fmt.Printf("%+v\n", v1)
 
 }
