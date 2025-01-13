@@ -3,69 +3,103 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"maps"
+	"slices"
 )
 
-// Ingredient
-type Ingredient interface {
-	ConvertUnit(Unit)
+type (
+	// IngredientBase is the basic type struct for all ingredients (solid, liquid, ...)
+	IngredientBase struct {
+		Name     string
+		Quantity float64
+		Unit     Unit
+		UnitName string
+	}
+	Solid  IngredientBase
+	Farine Solid
+
+	Ingredients []IngredientBase
+)
+
+var (
+	// ConvertKg[ingrName][unit] returns conversion from unit to Kg for ingrName
+	ConvertKg = map[string]map[Unit]float64{
+		"eau": map[Unit]float64{
+			Ml:  0.001,
+			Cas: 0.015},
+		"farine": map[Unit]float64{
+			Cas: 4.0 / 5.0 / 1000},
+		"sel": map[Unit]float64{
+			Cas: 15 / 1000},
+		"moutarde": map[Unit]float64{
+			Cas: 20 / 1000},
+		"miel": map[Unit]float64{
+			Cas: 21 / 1000},
+		// "huile": map[Unit]float64{
+		// 	Cas: / 1000},
+	}
+
+	// ConvertVol[FromUnit][ToUnit] returns volume conversion from FromUnit to ToUnit
+	ConvertVol map[Unit]map[Unit]float64
+)
+
+func init() {
+	ConvertVol = initConvertVol()
 }
 
-type UnitToKg map[Unit]float64
+func initConvertVol() map[Unit]map[Unit]float64 {
+	v := make(map[Unit]map[Unit]float64)
+	for _, unit := range []Unit{Cas, Cac, Ml} {
+		v[unit] = make(map[Unit]float64)
+	}
 
-var ConvertKg = map[string]UnitToKg{
-	"eau":    UnitToKg{Ml: 0.001, Cas: 0.0015},
-	"farine": UnitToKg{Cas: 4.0 / 5.0 / 1000},
-}
+	v[Cas][Cac] = 3 // 1 Cac = 3 Cac
+	v[Cac][Ml] = 5  // 1 Cac = 1 Ml
 
-// var GenericConvertKg = map[Unit]float64{
-// 	G:        0.001,
-// 	"farine": UnitToKg{Cas: 4.0 / 5.0 / 1000},
-// }
-//TODO:
-// G = 0.001 Kg
-// Cas = 3*Cac (volume)
-// Cac = 5 ml
+	v[Cas][Ml] = v[Cas][Cac] * v[Cac][Ml]
 
-func f() {
-	fmt.Println(ConvertKg)
-	fmt.Println(ConvertKg["eau"][Cas])
-	fmt.Println(ConvertKg["farine"][Cas])
+	v[Cac][Cas] = 1 / v[Cas][Cac]
+	v[Ml][Cas] = 1 / v[Cas][Ml]
+	v[Ml][Cac] = 1 / v[Cac][Ml]
 
-	fmt.Println("===============")
-	out, exist := ConvertKg["tot"][Cas]
-	fmt.Println(out, exist)
-
-	fmt.Println(GetInKg("farine", G))
+	return v
 }
 
 func GetInKg(item string, unit Unit) (kg float64, err error) {
+	// If unit is G, no conversion needed
+	if unit == G {
+		kg = 0.001
+		return
+	}
+
 	ConvertItem, itemExist := ConvertKg[item]
 	if itemExist {
 		value, unitExist := ConvertItem[unit]
+		// If unit exists, returns value
 		if unitExist {
 			kg = value
-		} else {
-			//TODO: add generic conversion, as G to Kg
-			if unit == G {
-				kg = 0.001
-			} else {
-				err = fmt.Errorf("Unit %v does not exist for item %v in ConvertKg", UnitDict[unit], item)
+			return
+
+			// if unit is "liquid", checks for existing other liquid conversion
+		} else if liquidUnit := unit == Cac || unit == Cas || unit == Ml; liquidUnit {
+			LiqUnits := slices.Collect(maps.Keys(ConvertKg[item]))
+			if len(LiqUnits) == 0 {
+				err = fmt.Errorf("Unit %v for item %v does not exist in ConvertKg", unit, item)
+				return
 			}
+
+			unit2 := LiqUnits[0]
+			value2 := ConvertKg[item][unit2]
+
+			kg = ConvertVol[unit][unit2] * value2
+			return
 		}
 	} else {
 		err = fmt.Errorf("Item %v does not exist in ConvertKg", item)
+		return
 	}
 
-	// kg = ConvertKg[item][unit]
-	return
-}
-
-// IngredientBase is the basic type struct for all ingredients (solid, liquid, ...)
-type IngredientBase struct {
-	Name     string
-	Quantity float64
-	Unit     Unit
-	UnitName string
+	return 0, fmt.Errorf("??? Unexpected error ????")
 }
 
 func CreateIngredient(name string, qty float64, unit Unit) IngredientBase {
@@ -86,9 +120,6 @@ func (ing *IngredientBase) ConvertUnit(toUnit Unit) {
 	}
 }
 
-type Solid IngredientBase
-type Farine Solid
-
 func (ing *Solid) ConvertUnit(toUnit Unit) {
 	switch {
 	case ing.Unit == G && toUnit == Kg:
@@ -105,14 +136,6 @@ func (ing *Farine) ConvertUnit(toUnit Unit) {
 		ing.UnitName = UnitDict[toUnit]
 	}
 }
-
-// {
-// 	name="Farine",
-// 	Qty = 100
-// 	{from=G, to=Kg, result=
-
-type Ingredients []IngredientBase
-type IngredientsVariant []Ingredients
 
 // TODO
 func (source *Ingredients) SetSameUnit(target Ingredients, ingrName string) {

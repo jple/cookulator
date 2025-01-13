@@ -63,7 +63,11 @@ type tester struct {
 }
 
 func createTesterInput(ingrName string, unit Unit, want float64) tester {
-	have, _ := GetInKg(ingrName, unit)
+	have, err := GetInKg(ingrName, unit)
+	if err != nil {
+		panic(err)
+	}
+
 	return tester{
 		call: fmt.Sprintf(`GetInKg("%v", %v)`, ingrName, UnitDict[unit]),
 		have: have,
@@ -78,8 +82,9 @@ func TestGetInKg(t *testing.T) {
 	tests = append(tests,
 		createTesterInput("farine", G, 0.001),
 		createTesterInput("any", G, 0.001),
-		createTesterInput("eau", Cas, 0.0015),
-		createTesterInput("eau", Cac, 0.0005),
+		createTesterInput("eau", Cas, 0.015),
+		createTesterInput("eau", Cac, 0.005),
+		createTesterInput("farine", Cac, ConvertKg["farine"][Cas]/3),
 	)
 
 	for _, test := range tests {

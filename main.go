@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+	"maps"
+	"slices"
+)
+
 type Unit int
 
 const (
@@ -20,8 +26,24 @@ var UnitDict = map[Unit]string{
 	Ml:  "Ml",
 }
 
+func f() {
+	fmt.Println(ConvertKg)
+	fmt.Println(ConvertKg["eau"][Cas])
+	fmt.Println(ConvertKg["farine"][Cas])
+
+	fmt.Println("===============")
+	out, exist := ConvertKg["tot"][Cas]
+	fmt.Println(out, exist)
+
+	fmt.Println(GetInKg("farine", G))
+
+	fmt.Println("===============")
+	fmt.Println(slices.Collect(maps.Keys(ConvertKg["eau"])))
+	fmt.Println(ConvertVol[Ml][Cas])
+}
+
 func main() {
-	// f()
+	f()
 	// v1 := Ingredients{
 	// 	CreateIngredient("farine", 1000, G),
 	// 	CreateIngredient("eau", 500, G),
