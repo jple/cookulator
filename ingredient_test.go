@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func CreateIngredient(name string, qty float64, unit Unit) IngredientBase {
+	return IngredientBase{
+		Name:     name,
+		Quantity: qty,
+		Unit:     unit,
+		UnitName: UnitDict[unit],
+	}
+}
+
 func TestConvertUnit(t *testing.T) {
 	x := CreateIngredient("farine", 100, G)
 	x.ConvertUnit(Kg)

@@ -102,15 +102,6 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 	return 0, fmt.Errorf("??? Unexpected error ????")
 }
 
-func CreateIngredient(name string, qty float64, unit Unit) IngredientBase {
-	return IngredientBase{
-		Name:     name,
-		Quantity: qty,
-		Unit:     unit,
-		UnitName: UnitDict[unit],
-	}
-}
-
 func (ing *IngredientBase) ConvertUnit(toUnit Unit) {
 	switch {
 	case ing.Unit == G && toUnit == Kg:
