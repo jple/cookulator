@@ -15,8 +15,6 @@ type (
 		Unit     Unit
 		UnitName string
 	}
-	Solid  IngredientBase
-	Farine Solid
 
 	Ingredients []IngredientBase
 )
@@ -71,6 +69,10 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 		kg = 0.001
 		return
 	}
+	if unit == Kg {
+		kg = 1
+		return
+	}
 
 	ConvertItem, itemExist := ConvertKg[item]
 	if itemExist {
@@ -102,30 +104,32 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 	return 0, fmt.Errorf("??? Unexpected error ????")
 }
 
-func (ing *IngredientBase) ConvertUnit(toUnit Unit) {
-	switch {
-	case ing.Unit == G && toUnit == Kg:
-		ing.Quantity = ing.Quantity / 1000
-		ing.Unit = toUnit
-		ing.UnitName = UnitDict[toUnit]
-	}
-}
+func (ing *IngredientBase) ConvertUnit(toUnit Unit) error {
 
-func (ing *Solid) ConvertUnit(toUnit Unit) {
-	switch {
-	case ing.Unit == G && toUnit == Kg:
-		(*IngredientBase)(ing).ConvertUnit(toUnit)
+	if toUnit == ing.Unit {
+		return nil
 	}
-}
-func (ing *Farine) ConvertUnit(toUnit Unit) {
-	switch {
-	case ing.Unit == G && toUnit == Kg:
-		(*IngredientBase)(ing).ConvertUnit(toUnit)
-	case ing.Unit == Ml && toUnit == G:
-		ing.Quantity = ing.Quantity * 4 / 5
-		ing.Unit = toUnit
-		ing.UnitName = UnitDict[toUnit]
+
+	toKg1, err1 := GetInKg(ing.Name, ing.Unit)
+	toKg2, err2 := GetInKg(ing.Name, toUnit)
+	if err1 != nil {
+		return err1
+		return fmt.Errorf("1) %v", err1)
 	}
+	if err2 != nil {
+		// return err2
+		return fmt.Errorf("2) %v", err2)
+	}
+
+	if toKg2 == 0 {
+		return fmt.Errorf("Dividing to zero")
+	}
+
+	ing.Quantity = ing.Quantity * toKg1 / toKg2
+	ing.Unit = toUnit
+	ing.UnitName = UnitDict[toUnit]
+
+	return nil
 }
 
 // TODO

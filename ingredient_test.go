@@ -17,34 +17,19 @@ func CreateIngredient(name string, qty float64, unit Unit) IngredientBase {
 
 func TestConvertUnit(t *testing.T) {
 	x := CreateIngredient("farine", 100, G)
-	x.ConvertUnit(Kg)
-	if x.Quantity != 0.1 {
-		t.Fatalf("ConvertUnit should return 0.1")
+	err := x.ConvertUnit(Kg)
+	if err != nil {
+		t.Fatalf(err.Error())
 	}
-}
+	if x.Quantity != 0.1 {
+		t.Fatalf("ConvertUnit should return 0.1, but return %v", x.Quantity)
+	}
 
-func TestSolidConvertUnit(t *testing.T) {
-	x := Solid{
-		Name:     "farine",
-		Quantity: 100,
-		Unit:     G,
-		UnitName: UnitDict[G],
-	}
-	x.ConvertUnit(Kg)
-	if x.Quantity != 0.1 {
-		t.Fatalf("ConvertUnit should return 0.1")
-	}
-}
-func TestFarineConvertUnit(t *testing.T) {
-	x := Farine{
-		Name:     "farine",
-		Quantity: 5,
-		Unit:     Ml,
-		UnitName: UnitDict[Ml],
-	}
-	x.ConvertUnit(G)
-	if x.Quantity != 4 {
-		t.Fatalf("ConvertUnit should return 4")
+	ing2 := CreateIngredient("eau", 500, G)
+	ing2.ConvertUnit(Ml)
+
+	if !(ing2.Quantity == 500 && ing2.Unit == Ml && ing2.UnitName == UnitDict[ing2.Unit]) {
+		t.Fatalf("Did not work")
 	}
 }
 
