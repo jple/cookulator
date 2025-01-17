@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 )
 
@@ -15,21 +14,60 @@ func CreateIngredient(name string, qty float64, unit Unit) IngredientBase {
 	}
 }
 
+func TestGetInKg(t *testing.T) {
+	var tests = []struct {
+		ingrName string
+		unit     Unit
+		want     float64
+	}{
+		{"farine", G, 0.001},
+		{"any", G, 0.001},
+		{"eau", Cas, 0.015},
+		{"farine", Cac, ConvertKg["farine"][Cas] / 3},
+	}
+
+	for _, test := range tests {
+		testname := fmt.Sprintf("(%v: %v --> Kg", test.ingrName, UnitDict[test.unit])
+		t.Run(testname, func(t *testing.T) {
+			have, err := GetInKg(test.ingrName, test.unit)
+			if err != nil {
+				t.Errorf(err.Error())
+			}
+			if have != test.want {
+				t.Errorf("Have %v, want %v", have, test.want)
+			}
+		})
+	}
+}
+
 func TestConvertUnit(t *testing.T) {
-	x := CreateIngredient("farine", 100, G)
-	err := x.ConvertUnit(Kg)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
-	if x.Quantity != 0.1 {
-		t.Fatalf("ConvertUnit should return 0.1, but return %v", x.Quantity)
+	var tests = []struct {
+		ingrName         string
+		qty              float64
+		fromUnit, toUnit Unit
+		want             float64
+	}{
+		{"farine", 100, G, Kg, 0.1},
+		{"eau", 500, G, Ml, 500},
+		{"eau", 1, Cas, Ml, 15},
+		{"eau", 1, Cas, Cac, 3},
+		{"farine", 1, Cas, Cac, 3},
 	}
 
-	ing2 := CreateIngredient("eau", 500, G)
-	ing2.ConvertUnit(Ml)
+	for _, test := range tests {
+		testname := fmt.Sprintf("(%v: %v %v --> %v", test.ingrName, test.qty, UnitDict[test.fromUnit], UnitDict[test.toUnit])
+		t.Run(testname, func(t *testing.T) {
+			x := CreateIngredient(test.ingrName, test.qty, test.fromUnit)
+			err := x.ConvertUnit(test.toUnit)
+			if err != nil {
+				t.Errorf(err.Error())
+			}
 
-	if !(ing2.Quantity == 500 && ing2.Unit == Ml && ing2.UnitName == UnitDict[ing2.Unit]) {
-		t.Fatalf("Did not work")
+			have := x.Quantity
+			if have != test.want {
+				t.Errorf("Have %v, test.want %v", have, test.want)
+			}
+		})
 	}
 }
 
@@ -47,50 +85,4 @@ func TestSetSameQty(t *testing.T) {
 	if v1[1].Quantity != 425 {
 		t.Fatalf("Quantity should return 425")
 	}
-
-}
-
-type tester struct {
-	call string
-	have float64
-	want float64
-}
-
-func createTesterInput(ingrName string, unit Unit, want float64) tester {
-	have, err := GetInKg(ingrName, unit)
-	if err != nil {
-		panic(err)
-	}
-
-	return tester{
-		call: fmt.Sprintf(`GetInKg("%v", %v)`, ingrName, UnitDict[unit]),
-		have: have,
-		want: want,
-	}
-}
-
-func TestGetInKg(t *testing.T) {
-	var errMsg []string
-	var tests []tester
-
-	tests = append(tests,
-		createTesterInput("farine", G, 0.001),
-		createTesterInput("any", G, 0.001),
-		createTesterInput("eau", Cas, 0.015),
-		createTesterInput("eau", Cac, 0.005),
-		createTesterInput("farine", Cac, ConvertKg["farine"][Cas]/3),
-	)
-
-	for _, test := range tests {
-		if test.have != test.want {
-			errMsg = append(errMsg,
-				fmt.Sprintf("%v returns %v, while expected %v\n",
-					test.call, test.have, test.want))
-		}
-	}
-
-	if errMsg != nil {
-		t.Fatalf(strings.Join(errMsg, ""))
-	}
-
 }
