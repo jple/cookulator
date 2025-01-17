@@ -1,23 +1,30 @@
-package main
+package unit
 
 import (
 	"fmt"
-	"log/slog"
 	"maps"
 	"slices"
 )
 
-type (
-	// IngredientBase is the basic type struct for all ingredients (solid, liquid, ...)
-	IngredientBase struct {
-		Name     string
-		Quantity float64
-		Unit     Unit
-		UnitName string
-	}
+type Unit int
 
-	Ingredients []IngredientBase
+const (
+	G Unit = iota
+	Kg
+	Cas
+	Cac
+	L
+	Ml
 )
+
+var DictName = map[Unit]string{
+	G:   "G",
+	Kg:  "Kg",
+	Cas: "Cas",
+	Cac: "Cac",
+	L:   "L",
+	Ml:  "Ml",
+}
 
 var (
 	// ConvertKg[ingrName][unit] returns conversion from unit to Kg for ingrName
@@ -102,60 +109,4 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 	}
 
 	return 0, fmt.Errorf("??? Unexpected error ????")
-}
-
-func (ing *IngredientBase) ConvertUnit(toUnit Unit) error {
-
-	if toUnit == ing.Unit {
-		return nil
-	}
-
-	toKg1, err1 := GetInKg(ing.Name, ing.Unit)
-	toKg2, err2 := GetInKg(ing.Name, toUnit)
-	if err1 != nil {
-		return err1
-		return fmt.Errorf("1) %v", err1)
-	}
-	if err2 != nil {
-		// return err2
-		return fmt.Errorf("2) %v", err2)
-	}
-
-	if toKg2 == 0 {
-		return fmt.Errorf("Dividing to zero")
-	}
-
-	ing.Quantity = ing.Quantity * toKg1 / toKg2
-	ing.Unit = toUnit
-	ing.UnitName = UnitDict[toUnit]
-
-	return nil
-}
-
-// TODO
-func (source *Ingredients) SetSameUnit(target Ingredients, ingrName string) {
-}
-
-func (ings Ingredients) GetIngredientIdByName(ingrName string) int {
-	for i, ing := range ings {
-		if ing.Name == ingrName {
-			return i
-		}
-	}
-	// panic("%v not in ingredients", ingrName)
-	slog.Error(ingrName)
-	slog.Error("not in ingredients")
-	return -1
-}
-
-func (source *Ingredients) SetSameQuantity(target Ingredients, ingrName string) {
-	source.SetSameUnit(target, ingrName)
-
-	i := (*source).GetIngredientIdByName(ingrName)
-	j := target.GetIngredientIdByName(ingrName)
-	ratio := target[i].Quantity / (*source)[j].Quantity
-
-	for i := range *source {
-		(*source)[i].Quantity = (*source)[i].Quantity * ratio
-	}
 }
