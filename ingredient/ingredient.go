@@ -2,7 +2,6 @@ package ingredient
 
 import (
 	"fmt"
-	"log/slog"
 
 	"ingredient-calculator/ingredient/unit"
 )
@@ -15,11 +14,9 @@ type (
 		Unit     unit.Unit
 		UnitName string
 	}
-
-	List []Content
 )
 
-func (ing *Content) ConvertUnit(toUnit unit.Unit) error {
+func (ing *Content) Convert(toUnit unit.Unit) error {
 
 	if toUnit == ing.Unit {
 		return nil
@@ -45,32 +42,4 @@ func (ing *Content) ConvertUnit(toUnit unit.Unit) error {
 	ing.UnitName = unit.DictName[toUnit]
 
 	return nil
-}
-
-// TODO
-func (source *List) SetSameUnit(target List, ingrName string) {
-}
-
-func (ings List) GetContentIdByName(ingrName string) int {
-	for i, ing := range ings {
-		if ing.Name == ingrName {
-			return i
-		}
-	}
-	// panic("%v not in ingredients", ingrName)
-	slog.Error(ingrName)
-	slog.Error("not in ingredients")
-	return -1
-}
-
-func (source *List) SetSameQuantity(target List, ingrName string) {
-	source.SetSameUnit(target, ingrName)
-
-	i := (*source).GetContentIdByName(ingrName)
-	j := target.GetContentIdByName(ingrName)
-	ratio := target[i].Quantity / (*source)[j].Quantity
-
-	for i := range *source {
-		(*source)[i].Quantity = (*source)[i].Quantity * ratio
-	}
 }

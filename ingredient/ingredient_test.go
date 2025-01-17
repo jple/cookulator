@@ -16,7 +16,7 @@ func CreateContent(name string, qty float64, u unit.Unit) Content {
 	}
 }
 
-func TestConvertUnit(t *testing.T) {
+func TestConvert(t *testing.T) {
 	var tests = []struct {
 		ingrName         string
 		qty              float64
@@ -34,7 +34,7 @@ func TestConvertUnit(t *testing.T) {
 		testname := fmt.Sprintf("(%v: %v %v --> %v", test.ingrName, test.qty, unit.DictName[test.fromUnit], unit.DictName[test.toUnit])
 		t.Run(testname, func(t *testing.T) {
 			x := CreateContent(test.ingrName, test.qty, test.fromUnit)
-			err := x.ConvertUnit(test.toUnit)
+			err := x.Convert(test.toUnit)
 			if err != nil {
 				t.Errorf(err.Error())
 			}
@@ -44,21 +44,5 @@ func TestConvertUnit(t *testing.T) {
 				t.Errorf("Have %v, test.want %v", have, test.want)
 			}
 		})
-	}
-}
-
-func TestSetSameQty(t *testing.T) {
-	v1 := List{
-		CreateContent("farine", 1000, unit.G),
-		CreateContent("eau", 500, unit.G),
-	}
-	v2 := List{
-		CreateContent("farine", 850, unit.G),
-		CreateContent("eau", 400, unit.G),
-	}
-	v1.SetSameQuantity(v2, "farine")
-
-	if v1[1].Quantity != 425 {
-		t.Fatalf("Quantity should return 425")
 	}
 }
