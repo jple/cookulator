@@ -25,8 +25,8 @@ func (ing *Content) ConvertUnit(toUnit unit.Unit) error {
 		return nil
 	}
 
-	toKg1, err1 := unit.GetInKg(ing.Name, ing.Unit)
-	toKg2, err2 := unit.GetInKg(ing.Name, toUnit)
+	toKg1, err1 := unit.ToKg(ing.Name, ing.Unit)
+	toKg2, err2 := unit.ToKg(ing.Name, toUnit)
 	if err1 != nil {
 		return err1
 		return fmt.Errorf("1) %v", err1)

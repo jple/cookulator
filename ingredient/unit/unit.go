@@ -27,8 +27,8 @@ var DictName = map[Unit]string{
 }
 
 var (
-	// ConvertKg[ingrName][unit] returns conversion from unit to Kg for ingrName
-	ConvertKg = map[string]map[Unit]float64{
+	// DictToKg[ingrName][unit] returns conversion from unit to Kg for ingrName
+	DictToKg = map[string]map[Unit]float64{
 		"eau": map[Unit]float64{
 			Ml:  0.001,
 			Cas: 0.015},
@@ -44,15 +44,15 @@ var (
 		// 	Cas: / 1000},
 	}
 
-	// ConvertVol[FromUnit][ToUnit] returns volume conversion from FromUnit to ToUnit
-	ConvertVol map[Unit]map[Unit]float64
+	// DictToVolume[FromUnit][ToUnit] returns volume conversion from FromUnit to ToUnit
+	DictToVolume map[Unit]map[Unit]float64
 )
 
 func init() {
-	ConvertVol = initConvertVol()
+	DictToVolume = initDictToVolume()
 }
 
-func initConvertVol() map[Unit]map[Unit]float64 {
+func initDictToVolume() map[Unit]map[Unit]float64 {
 	v := make(map[Unit]map[Unit]float64)
 	for _, unit := range []Unit{Cas, Cac, Ml} {
 		v[unit] = make(map[Unit]float64)
@@ -70,7 +70,7 @@ func initConvertVol() map[Unit]map[Unit]float64 {
 	return v
 }
 
-func GetInKg(item string, unit Unit) (kg float64, err error) {
+func ToKg(item string, unit Unit) (kg float64, err error) {
 	// If unit is G, no conversion needed
 	if unit == G {
 		kg = 0.001
@@ -81,7 +81,7 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 		return
 	}
 
-	ConvertItem, itemExist := ConvertKg[item]
+	ConvertItem, itemExist := DictToKg[item]
 	if itemExist {
 		value, unitExist := ConvertItem[unit]
 		// If unit exists, returns value
@@ -91,20 +91,20 @@ func GetInKg(item string, unit Unit) (kg float64, err error) {
 
 			// if unit is "liquid", checks for existing other liquid conversion
 		} else if liquidUnit := unit == Cac || unit == Cas || unit == Ml; liquidUnit {
-			LiqUnits := slices.Collect(maps.Keys(ConvertKg[item]))
+			LiqUnits := slices.Collect(maps.Keys(DictToKg[item]))
 			if len(LiqUnits) == 0 {
-				err = fmt.Errorf("Unit %v for item %v does not exist in ConvertKg", unit, item)
+				err = fmt.Errorf("Unit %v for item %v does not exist in DictToKg", unit, item)
 				return
 			}
 
 			unit2 := LiqUnits[0]
-			value2 := ConvertKg[item][unit2]
+			value2 := DictToKg[item][unit2]
 
-			kg = ConvertVol[unit][unit2] * value2
+			kg = DictToVolume[unit][unit2] * value2
 			return
 		}
 	} else {
-		err = fmt.Errorf("Item %v does not exist in ConvertKg", item)
+		err = fmt.Errorf("Item %v does not exist in DictToKg", item)
 		return
 	}
 
