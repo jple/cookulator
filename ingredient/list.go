@@ -60,6 +60,7 @@ func (source *List) SetSameQuantity(target List, ingrName string) {
 func (source *List) SetSameUnit(target List, ingrName string) {
 }
 
-func ConvertList(compareList []List, refId int, refIngr string) []List {
-	return nil
+// TODO: rename to Equalized
+func ConvertList(compareList []List, refListId int, refIngr string) []List {
+	return compareList
 }

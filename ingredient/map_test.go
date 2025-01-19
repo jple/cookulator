@@ -7,8 +7,8 @@ import (
 
 type Map map[string]Element
 
-func (m Map) GetElement(ingrName string) (Element, error) {
-	return m[ingrName], nil
+func (m Map) GetElement(ingrName string) Element {
+	return m[ingrName]
 }
 
 func BenchmarkGetElementFromMap(b *testing.B) {
