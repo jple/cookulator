@@ -7,8 +7,8 @@ import (
 	"ingredient-calculator/ingredient/unit"
 )
 
-func CreateContent(name string, qty float64, u unit.Unit) Content {
-	return Content{
+func CreateElement(name string, qty float64, u unit.Unit) Element {
+	return Element{
 		Name:     name,
 		Quantity: qty,
 		Unit:     u,
@@ -33,7 +33,7 @@ func TestConvert(t *testing.T) {
 	for _, test := range tests {
 		testname := fmt.Sprintf("(%v: %v %v --> %v", test.ingrName, test.qty, unit.DictName[test.fromUnit], unit.DictName[test.toUnit])
 		t.Run(testname, func(t *testing.T) {
-			x := CreateContent(test.ingrName, test.qty, test.fromUnit)
+			x := CreateElement(test.ingrName, test.qty, test.fromUnit)
 			err := x.Convert(test.toUnit)
 			if err != nil {
 				t.Errorf(err.Error())

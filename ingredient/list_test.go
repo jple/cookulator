@@ -7,12 +7,12 @@ import (
 
 func TestSetSameQty(t *testing.T) {
 	v1 := List{
-		CreateContent("farine", 1000, unit.G),
-		CreateContent("eau", 500, unit.G),
+		CreateElement("farine", 1000, unit.G),
+		CreateElement("eau", 500, unit.G),
 	}
 	v2 := List{
-		CreateContent("farine", 850, unit.G),
-		CreateContent("eau", 400, unit.G),
+		CreateElement("farine", 850, unit.G),
+		CreateElement("eau", 400, unit.G),
 	}
 	v1.SetSameQuantity(v2, "farine")
 
@@ -23,12 +23,12 @@ func TestSetSameQty(t *testing.T) {
 
 func TestConvertList(t *testing.T) {
 	v1 := List{
-		CreateContent("farine", 1000, unit.G),
-		CreateContent("eau", 500, unit.G),
+		CreateElement("farine", 1000, unit.G),
+		CreateElement("eau", 500, unit.G),
 	}
 	v2 := List{
-		CreateContent("farine", 850, unit.G),
-		CreateContent("eau", 400, unit.G),
+		CreateElement("farine", 850, unit.G),
+		CreateElement("eau", 400, unit.G),
 	}
 
 	var compareList = []List{

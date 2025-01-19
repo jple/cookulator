@@ -3,21 +3,21 @@ package ingredient
 import "log/slog"
 
 type (
-	List []Content // TODO: change to map[string]Content
+	List []Element // TODO: change to map[string]Content
 )
 
 // TODO
 // MAY NOT BE WORKING
-func ListAdd(l List, c Content) List {
-	return List{
-		c.Name: c,
-		l,
-	}
-}
-func ListNew() List {
-}
+// func ListAdd(l List, c Element) List {
+// 	return List{
+// 		c.Name: c,
+// 		l,
+// 	}
+// }
+// func ListNew() List {
+// }
 
-func (ings List) GetContentIdByName(ingrName string) int {
+func (ings List) GetElementIdByName(ingrName string) int {
 	for i, ing := range ings {
 		if ing.Name == ingrName {
 			return i
@@ -32,8 +32,8 @@ func (ings List) GetContentIdByName(ingrName string) int {
 func (source *List) SetSameQuantity(target List, ingrName string) {
 	source.SetSameUnit(target, ingrName)
 
-	i := (*source).GetContentIdByName(ingrName)
-	j := target.GetContentIdByName(ingrName)
+	i := (*source).GetElementIdByName(ingrName)
+	j := target.GetElementIdByName(ingrName)
 	ratio := target[i].Quantity / (*source)[j].Quantity
 
 	for i := range *source {

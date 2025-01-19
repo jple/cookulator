@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	// Content is the basic type struct describing ingredient
-	Content struct {
+	// Element is the basic type struct describing ingredient
+	Element struct {
 		Name     string
 		Quantity float64
 		Unit     unit.Unit
@@ -16,7 +16,7 @@ type (
 	}
 )
 
-func (ing *Content) Convert(toUnit unit.Unit) error {
+func (ing *Element) Convert(toUnit unit.Unit) error {
 
 	if toUnit == ing.Unit {
 		return nil
