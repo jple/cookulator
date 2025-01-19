@@ -1,6 +1,8 @@
 package ingredient
 
-import "log/slog"
+import (
+	"fmt"
+)
 
 type (
 	List []Element // TODO: change to map[string]Content
@@ -17,23 +19,36 @@ type (
 // func ListNew() List {
 // }
 
-func (ings List) GetElementIdByName(ingrName string) int {
+func (ings List) GetElementIdByName(ingrName string) (int, error) {
 	for i, ing := range ings {
 		if ing.Name == ingrName {
-			return i
+			return i, nil
 		}
 	}
-	// panic("%v not in ingredients", ingrName)
-	slog.Error(ingrName)
-	slog.Error("not in ingredients")
-	return -1
+
+	return -1, fmt.Errorf("%v is in the List", ingrName)
+}
+
+func (ings List) GetElement(ingrName string) (Element, error) {
+	i, err := ings.GetElementIdByName(ingrName)
+	if err != nil {
+		return Element{}, err
+	}
+	return ings[i], nil
 }
 
 func (source *List) SetSameQuantity(target List, ingrName string) {
 	source.SetSameUnit(target, ingrName)
 
-	i := (*source).GetElementIdByName(ingrName)
-	j := target.GetElementIdByName(ingrName)
+	i, err1 := (*source).GetElementIdByName(ingrName)
+	if err1 != nil {
+		panic(err1)
+	}
+	j, err2 := target.GetElementIdByName(ingrName)
+	if err2 != nil {
+		panic(err2)
+	}
+
 	ratio := target[i].Quantity / (*source)[j].Quantity
 
 	for i := range *source {
