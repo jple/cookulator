@@ -59,12 +59,17 @@ func TestConvertList(t *testing.T) {
 		CreateElement("farine", 850, unit.G),
 		CreateElement("eau", 400, unit.G),
 	}
+	l3 := List{
+		CreateElement("farine", 850, unit.G),
+		CreateElement("eau", 80, unit.Cac),
+	}
 
 	// var compareList = []List{l1, l2}
 
 	refIngr := "farine"
-	stdList := ConvertList([]List{l1, l2}, 0, refIngr)
+	stdList := ConvertList([]List{l1, l2, l3}, 0, refIngr)
 	ll2 := stdList[1]
+	ll3 := stdList[2]
 
 	conv := func(x, y, refY float64) float64 {
 		return x * refY / y
@@ -83,6 +88,25 @@ func TestConvertList(t *testing.T) {
 		if have != want {
 			t.Errorf("%v: Have %v, want %v", ingr, have, want)
 		}
+	}
 
+	for _, ingr := range []string{"farine", "eau"} {
+		x, _ := l3.GetElement(ingr)
+		y, _ := l3.GetElement(refIngr)
+		refY, _ := l1.GetElement(refIngr)
+		var want float64
+		if ingr == "farine" {
+			want = 1000
+		} else if ingr == "eau" {
+			y.Convert(refY.Unit)
+			want = conv(x.Quantity, y.Quantity, refY.Quantity)
+		}
+
+		el, _ := ll3.GetElement(ingr)
+		have = el.Quantity
+
+		if have != want {
+			t.Errorf("%v: Have %v, want %v", ingr, have, want)
+		}
 	}
 }
