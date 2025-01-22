@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	. "ingredient-calculator/ingredient/unit"
+	"ingredient-calculator/ingredient/unit"
 )
 
 func f() {
-	fmt.Println(ConvertKg)
-	fmt.Println(ConvertKg["eau"][Cas])
+	fmt.Println(unit.DictToKg)
+	fmt.Println(unit.DictToKg["eau"][unit.Cas])
 }
 
 func main() {
