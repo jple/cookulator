@@ -7,15 +7,6 @@ import (
 	"ingredient-calculator/ingredient/unit"
 )
 
-func CreateElement(name string, qty float64, u unit.Unit) Element {
-	return Element{
-		Name:     name,
-		Quantity: qty,
-		Unit:     u,
-		UnitName: unit.DictName[u],
-	}
-}
-
 func TestConvert(t *testing.T) {
 	var tests = []struct {
 		ingrName         string

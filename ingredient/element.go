@@ -16,6 +16,15 @@ type (
 	}
 )
 
+func CreateElement(name string, qty float64, u unit.Unit) Element {
+	return Element{
+		Name:     name,
+		Quantity: qty,
+		Unit:     u,
+		UnitName: unit.DictName[u],
+	}
+}
+
 func (ing *Element) Convert(toUnit unit.Unit) error {
 
 	if toUnit == ing.Unit {
