@@ -70,6 +70,9 @@ func initDictToVolume() map[Unit]map[Unit]float64 {
 	return v
 }
 
+// TODO: current behaviour of ToKg("toto", Ml) will return ToKg("eau", Ml)
+// which is not always true
+// TODO: refacto
 func ToKg(item string, unit Unit) (kg float64, err error) {
 	// If unit is G, no conversion needed
 	if unit == G {
@@ -103,6 +106,10 @@ func ToKg(item string, unit Unit) (kg float64, err error) {
 			kg = DictToVolume[unit][unit2] * value2
 			return
 		}
+		// If item does not exist, consider using liquid conversion in liquid unit case
+		// TODO: not always true !!
+	} else if liquidUnit := unit == Cac || unit == Cas || unit == Ml; liquidUnit {
+		return ToKg("eau", unit)
 	} else {
 		err = fmt.Errorf("Item %v does not exist in DictToKg", item)
 		return
