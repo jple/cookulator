@@ -11,6 +11,9 @@ import (
 
 type (
 	List []Element
+	// struct {
+	// 	Elements
+	// }
 )
 
 // TODO
@@ -123,6 +126,15 @@ func (ll CompareList) SortByName() CompareList {
 func (ll CompareList) Show() {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, '.', tabwriter.AlignRight|tabwriter.Debug)
 	ll = ll.SortByName()
+
+	// Print header
+	fmt.Fprintf(w, "\t")
+	for i, _ := range ll {
+		fmt.Fprintf(w, "%v\t", i)
+	}
+	fmt.Fprintf(w, "\n")
+
+	// Print body
 	for _, name := range ll.GetAllNames() {
 		fmt.Fprintf(w, "%v\t", name)
 		for _, l := range ll {
